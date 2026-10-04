@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"log"
-	"time"
 
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
@@ -43,29 +42,10 @@ func (a *app) toggle() {
 	a.disabled = a.err == nil
 }
 
-// The themes give the widgets the colors of macOS: its label colors and
-// system blue, over the material of the window.
-var lightTheme, darkTheme = macTheme(ui.LightTheme()), macTheme(ui.DarkTheme())
-
-func macTheme(t *ui.Theme) *ui.Theme {
-	if t.Dark {
-		t.Text, t.TextMuted = ui.RGBA(255, 255, 255, 0.85), ui.RGBA(255, 255, 255, 0.55)
-		t.Accent, t.AccentPressed = ui.Hex("#0a84ff"), ui.Hex("#409cff")
-	} else {
-		t.Text, t.TextMuted = ui.RGBA(0, 0, 0, 0.85), ui.RGBA(0, 0, 0, 0.5)
-		t.Accent, t.AccentPressed = ui.Hex("#007aff"), ui.Hex("#0068d9")
-	}
-	// Buttons of macOS do not change under the pointer.
-	t.AccentHover = t.Accent
-	return t
-}
-
 func (a *app) view(c *ui.Context) {
-	t := lightTheme
-	if c.Theme().Dark {
-		t = darkTheme
-	}
-	c.SetTheme(t)
+	// The default theme follows the system: its light or dark appearance,
+	// the accent color the user chose and Increase Contrast.
+	t := c.Theme()
 	// Shows the window's material.
 	c.Root().Background(ui.Transparent)
 
@@ -76,15 +56,16 @@ func (a *app) view(c *ui.Context) {
 		// the icon, as on the system's own symbols, the title and the
 		// switch.
 		icon, title := keyboardIcon, "Keyboard Unlocked"
-		from, to := ui.Hex("#a4a4a9"), ui.Hex("#7c7c81")
+		white := ui.Hex("#ffffff")
+		from, to, glyph := ui.Hex("#a4a4a9"), ui.Hex("#7c7c81"), white
 		if a.disabled {
 			icon, title = keyboardOffIcon, "Keyboard Locked"
-			from, to = ui.Hex("#4aa3ff"), ui.Hex("#007aff")
+			from, to, glyph = t.Accent.Mix(white, 0.3), t.Accent, t.AccentText
 		}
 		ui.Column(c).AlignItems(ui.Center).Gap(12).Children(func() {
 			ui.Column(c).Size(64, 64).Center().Radius(15).
 				Gradient(from, to, 180).Shadow(0, 1, 2.5, 0, ui.RGBA(0, 0, 0, 0.22)).
-				TextColor(ui.Hex("#ffffff")).Children(func() {
+				TextColor(glyph).Children(func() {
 				ui.Icon(c, icon).Size(42, 42)
 			})
 			ui.Text(c, title).FontSize(17).FontWeight(600)
@@ -95,18 +76,19 @@ func (a *app) view(c *ui.Context) {
 		// hand holding a cloth. Its place never changes, so it stays under
 		// the pointer for the second click.
 		on := a.disabled
-		row := ui.SwitchBase(c, &on).Size(232, 44).PaddingX(12).Radius(8)
-		if row.Changed() {
-			a.toggle()
-		}
+		row := ui.Row(c).Size(232, 44).PaddingX(12).Radius(8)
+		toggled := row.Clicked()
 		fill, line := ui.RGBA(0, 0, 0, 0.035), ui.RGBA(0, 0, 0, 0.07)
 		if t.Dark {
 			fill, line = ui.RGBA(255, 255, 255, 0.05), ui.RGBA(255, 255, 255, 0.08)
 		}
 		row.Background(fill).Border(1, line).Children(func() {
 			ui.Text(c, "Lock Keyboard").Grow(1)
-			a.track(c, row.Animate("knob", b2f(a.disabled), 150*time.Millisecond))
+			toggled = ui.Switch(c, &on).Label("Lock Keyboard").Changed() || toggled
 		})
+		if toggled {
+			a.toggle()
+		}
 
 		if a.err != nil {
 			ui.Column(c).Absolute().Left(24).Right(24).Bottom(16).AlignItems(ui.Center).Gap(3).Children(func() {
@@ -121,29 +103,6 @@ func (a *app) view(c *ui.Context) {
 			})
 		}
 	})
-}
-
-// track draws the switch of the row: the track in the accent color as far
-// as pos, from 0 for off to 1 for on, has the knob moved across it.
-func (a *app) track(c *ui.Context, pos float32) {
-	t := c.Theme()
-	off, knob := ui.RGBA(0, 0, 0, 0.12), ui.Hex("#ffffff")
-	if t.Dark {
-		off, knob = ui.RGBA(255, 255, 255, 0.16), ui.Hex("#e4e4e6")
-	}
-	ui.Box(c).Size(38, 22).Radius(11).Background(off.Mix(t.Accent, pos)).Draw(func(p *ui.Painter, r ui.Rect) {
-		d := r.H - 4
-		k := ui.Rect{X: r.X + 2 + pos*(r.W-r.H), Y: r.Y + 2, W: d, H: d}
-		p.Shadow(k, d/2, 0, 1, 2.5, 0, ui.RGBA(0, 0, 0, 0.25))
-		p.Fill(k, knob, d/2)
-	})
-}
-
-func b2f(b bool) float32 {
-	if b {
-		return 1
-	}
-	return 0
 }
 
 func main() {
