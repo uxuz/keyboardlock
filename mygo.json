@@ -1,0 +1,6 @@
+{
+  "name": "Keyboard Lock",
+  "identifier": "com.example.keyboardlock",
+  "version": "0.1.0",
+  "out": "build"
+}
