@@ -4,6 +4,19 @@ A tiny macOS app that turns the keyboard's keys off with one click and back
 on with another, so you can wipe the keyboard without typing anything. The
 trackpad and mouse keep working.
 
+<p>
+  <img src="screenshots/unlocked-light.png" width="280" alt="The window with the keyboard unlocked, in the light appearance">
+  <img src="screenshots/locked-light.png" width="280" alt="The window with the keyboard locked, in the light appearance">
+</p>
+<p>
+  <img src="screenshots/unlocked-dark.png" width="280" alt="The window with the keyboard unlocked, in the dark appearance">
+  <img src="screenshots/locked-dark.png" width="280" alt="The window with the keyboard locked, in the dark appearance">
+</p>
+
+These are renders of the window's content, made by the tests' renderer: the
+real window also has its close and minimize buttons, a translucent
+background, and the accent color of the system in place of this blue.
+
 This is a toy project, made to try out [MyGo](https://mygo.egoist.dev/docs),
 a toolkit for building desktop apps in Go. The window is MyGo's native UI,
 written in Go alone, with no web page behind it. Expect rough edges: the app
