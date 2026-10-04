@@ -47,6 +47,28 @@ func TestView(t *testing.T) {
 	}
 }
 
+// The whole row toggles, and its switch does so once, not as the row too.
+func TestSwitch(t *testing.T) {
+	kb := &fakeKeyboard{}
+	a := &app{kb: kb}
+	tt := ui.NewTester(a.view, 280, 300)
+	label, ok := tt.Find("Lock Keyboard")
+	if !ok {
+		t.Fatalf("no row, texts %q", tt.Texts())
+	}
+	// The switch is at the right end of the row, 232 wide in the middle
+	// of the window.
+	y := label.Y + label.H/2
+	tt.ClickAt(230, y)
+	if !kb.disabled || !tt.HasText("Keyboard Locked") {
+		t.Errorf("disabled %v after a click on the switch, texts %q", kb.disabled, tt.Texts())
+	}
+	tt.ClickAt(140, y)
+	if kb.disabled || !tt.HasText("Keyboard Unlocked") {
+		t.Errorf("disabled %v after a click on the row, texts %q", kb.disabled, tt.Texts())
+	}
+}
+
 // Without the Accessibility permission the keyboard stays on, and the view
 // says how to give it.
 func TestViewWithoutAccess(t *testing.T) {
