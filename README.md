@@ -5,17 +5,12 @@ on with another, so you can wipe the keyboard without typing anything. The
 trackpad and mouse keep working.
 
 <p>
-  <img src="screenshots/unlocked-light.png" width="280" alt="The window with the keyboard unlocked, in the light appearance">
-  <img src="screenshots/locked-light.png" width="280" alt="The window with the keyboard locked, in the light appearance">
-</p>
-<p>
-  <img src="screenshots/unlocked-dark.png" width="280" alt="The window with the keyboard unlocked, in the dark appearance">
-  <img src="screenshots/locked-dark.png" width="280" alt="The window with the keyboard locked, in the dark appearance">
+  <img src="screenshots/unlocked.png" width="392" alt="The window with the keyboard unlocked, in the dark appearance">
+  <img src="screenshots/locked.png" width="392" alt="The window with the keyboard locked, in the dark appearance">
 </p>
 
-These are renders of the window's content, made by the tests' renderer: the
-real window also has its close and minimize buttons, a translucent
-background, and the accent color of the system in place of this blue.
+The window follows the system's light or dark appearance and its accent
+color.
 
 This is a toy project, made to try out [MyGo](https://mygo.egoist.dev/docs),
 a toolkit for building desktop apps in Go. The window is MyGo's native UI,
